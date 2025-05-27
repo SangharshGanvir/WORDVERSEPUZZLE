@@ -155,10 +155,22 @@ function animateKeyPress(keyElement) {
 }
 
 // Bootstrap modal instances
-let modalInstance, statsModalInstance, shareModalInstance, shareGameModalInstance;
+let modalInstance, statsModalInstance, shareModalInstance, shareGameModalInstance, featuresModalInstance;
 
 // Initialize Bootstrap modals after DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the Other Features modal
+    featuresModalInstance = new bootstrap.Modal(document.getElementById('features-modal'));
+    
+    // Add event listener for the Other Features link
+    const otherFeaturesLink = document.getElementById('other-features-link');
+    if (otherFeaturesLink) {
+        otherFeaturesLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            featuresModalInstance.show();
+        });
+    }
+    
     modalInstance = new bootstrap.Modal(document.getElementById('modal'));
     statsModalInstance = new bootstrap.Modal(document.getElementById('stats-modal'));
     shareModalInstance = new bootstrap.Modal(document.getElementById('share-modal'));
@@ -168,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Preload sounds before initializing the game
     preloadSounds();
     
-    // Initialize the game
+    // Initialize the game (only called once)
     initializeGame();
     
     // Update sound button icon based on mute state
@@ -436,22 +448,26 @@ function setupEventListeners() {
     
     // Game share buttons
     document.getElementById('share-game-twitter').addEventListener('click', () => {
+        const gameUrl = document.getElementById('game-link').value || window.location.href;
         const text = encodeURIComponent('Challenge yourself with WORDVERSE Puzzle! A daily word guessing game.');
-        window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(window.location.href)}`, '_blank');
+        window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(gameUrl)}`, '_blank');
     });
     
     document.getElementById('share-game-facebook').addEventListener('click', () => {
-        window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.href), '_blank');
+        const gameUrl = document.getElementById('game-link').value || window.location.href;
+        window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(gameUrl), '_blank');
     });
     
     document.getElementById('share-game-whatsapp').addEventListener('click', () => {
-        const text = encodeURIComponent('Challenge yourself with WORDVERSE Puzzle! A daily word guessing game. ' + window.location.href);
+        const gameUrl = document.getElementById('game-link').value || window.location.href;
+        const text = encodeURIComponent('Challenge yourself with WORDVERSE Puzzle! A daily word guessing game. ' + gameUrl);
         window.open(`https://wa.me/?text=${text}`, '_blank');
     });
     
     document.getElementById('share-game-email').addEventListener('click', () => {
+        const gameUrl = document.getElementById('game-link').value || window.location.href;
         const subject = encodeURIComponent('Try WORDVERSE Puzzle!');
-        const body = encodeURIComponent('Challenge yourself with WORDVERSE Puzzle! A daily word guessing game. ' + window.location.href);
+        const body = encodeURIComponent('Challenge yourself with WORDVERSE Puzzle! A daily word guessing game. ' + gameUrl);
         window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
     });
     

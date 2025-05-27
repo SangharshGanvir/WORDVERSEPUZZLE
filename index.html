@@ -141,7 +141,7 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content share-modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Share Your Results</h5>
+                        <h5 class="modal-title"><i class="fas fa-share-alt me-2"></i>Share Your Results</h5>
                         <button type="button" class="btn-close share-modal-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -220,7 +220,7 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content share-modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Share WORDVERSE Puzzle</h5>
+                        <h5 class="modal-title"><i class="fas fa-link me-2"></i>Share WORDVERSE Puzzle</h5>
                         <button type="button" class="btn-close share-game-modal-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -293,7 +293,7 @@
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">How to Play</h5>
+                        <h5 class="modal-title"><i class="fas fa-question-circle me-2"></i>How to Play</h5>
                         <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -360,7 +360,7 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Statistics</h5>
+                        <h5 class="modal-title"><i class="fas fa-chart-bar me-2"></i>Statistics</h5>
                         <button type="button" class="btn-close stats-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -503,7 +503,14 @@
         <footer class="mt-4 py-3 text-center footer-gradient">
             <div class="footer-content position-relative">
                 <div class="footer-wave"></div>
-                <p class="mb-0 position-relative z-1">Designed & Developed by <span class="fw-bold text-light">Joker Designs</span></p>
+                <div class="d-flex flex-column flex-md-row justify-content-center align-items-center gap-3 position-relative z-1">
+                    <p class="mb-0">Designed & Developed by <span class="fw-bold text-light">Joker Designs</span></p>
+                    <div class="footer-links">
+                        <a href="#" id="other-features-link" class="text-white text-decoration-none">
+                            <i class="fas fa-puzzle-piece me-1"></i> Other Features
+                        </a>
+                    </div>
+                </div>
                 <div class="footer-dots"></div>
             </div>
         </footer>
@@ -540,5 +547,209 @@
       }
     }
     </script>
+    
+    <!-- Other Features Modal -->
+    <div id="features-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content features-modal-content">
+                <div class="modal-header features-modal-header">
+                    <h5 class="modal-title"><i class="fas fa-puzzle-piece me-2"></i>WORDVERSE Ecosystem</h5>
+                    <button type="button" class="btn-close features-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body features-modal-body">
+                    <!-- Decorative elements -->
+                    <div class="features-decoration"></div>
+                    
+                    <div class="features-container">
+                        <div class="features-intro mb-4 text-center">
+                            <h4 class="mb-2">Explore Our Growing Ecosystem</h4>
+                            <p class="text-muted mb-0">We're expanding beyond word puzzles! Check out these upcoming features and games.</p>
+                        </div>
+                        
+                        <!-- Games Section -->
+                        <div class="features-section">
+                            <div class="features-section-header">
+                                <div class="features-icon"><i class="fas fa-gamepad"></i></div>
+                                <h5 class="mb-0">Games</h5>
+                            </div>
+                            <div class="features-section-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-card-icon"><i class="fas fa-th"></i></div>
+                                            <div class="feature-card-content">
+                                                <h6>2048</h6>
+                                                <p class="mb-2 small">Merge tiles to reach 2048 in this addictive puzzle game.</p>
+                                                <span class="coming-soon-badge">Coming Soon</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-card-icon"><i class="fas fa-dove"></i></div>
+                                            <div class="feature-card-content">
+                                                <h6>Flappy Bird</h6>
+                                                <p class="mb-2 small">Navigate through pipes in this classic arcade game.</p>
+                                                <span class="coming-soon-badge">Coming Soon</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-card-icon"><i class="fas fa-hashtag"></i></div>
+                                            <div class="feature-card-content">
+                                                <h6>Tic Tac Toe</h6>
+                                                <p class="mb-2 small">Classic game of X's and O's with single and multiplayer modes.</p>
+                                                <span class="coming-soon-badge">Coming Soon</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tools Section -->
+                        <div class="features-section">
+                            <div class="features-section-header">
+                                <div class="features-icon"><i class="fas fa-tools"></i></div>
+                                <h5 class="mb-0">Tools</h5>
+                            </div>
+                            <div class="features-section-body">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <div class="feature-card">
+                                            <div class="feature-card-icon"><i class="fas fa-calculator"></i></div>
+                                            <div class="feature-card-content">
+                                                <h6>GPA Calculator</h6>
+                                                <p class="mb-2 small">Calculate your GPA easily with our simple tool.</p>
+                                                <span class="coming-soon-badge">Coming Soon</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="feature-card">
+                                            <div class="feature-card-icon"><i class="fas fa-weight"></i></div>
+                                            <div class="feature-card-content">
+                                                <h6>BMI Calculator</h6>
+                                                <p class="mb-2 small">Check your Body Mass Index with our calculator.</p>
+                                                <span class="coming-soon-badge">Coming Soon</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="feature-card">
+                                            <div class="feature-card-icon"><i class="fas fa-birthday-cake"></i></div>
+                                            <div class="feature-card-content">
+                                                <h6>Age Calculator</h6>
+                                                <p class="mb-2 small">Calculate your exact age in years, months, and days.</p>
+                                                <span class="coming-soon-badge">Coming Soon</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="feature-card">
+                                            <div class="feature-card-icon"><i class="fas fa-exchange-alt"></i></div>
+                                            <div class="feature-card-content">
+                                                <h6>Unit Converter</h6>
+                                                <p class="mb-2 small">Convert between different units of measurement.</p>
+                                                <span class="coming-soon-badge">Coming Soon</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quotes/Jokes Section -->
+                        <div class="features-section">
+                            <div class="features-section-header">
+                                <div class="features-icon"><i class="fas fa-quote-right"></i></div>
+                                <h5 class="mb-0">Quotes & Jokes</h5>
+                            </div>
+                            <div class="features-section-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-card-icon"><i class="fas fa-lightbulb"></i></div>
+                                            <div class="feature-card-content">
+                                                <h6>Motivational Quotes</h6>
+                                                <p class="mb-2 small">Get inspired with random motivational quotes.</p>
+                                                <span class="coming-soon-badge">Coming Soon</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-card-icon"><i class="fas fa-laugh"></i></div>
+                                            <div class="feature-card-content">
+                                                <h6>Jokes by Category</h6>
+                                                <p class="mb-2 small">Browse jokes by category for a good laugh.</p>
+                                                <span class="coming-soon-badge">Coming Soon</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-card-icon"><i class="fas fa-calendar-day"></i></div>
+                                            <div class="feature-card-content">
+                                                <h6>Daily Quote Generator</h6>
+                                                <p class="mb-2 small">Start your day with a fresh quote every morning.</p>
+                                                <span class="coming-soon-badge">Coming Soon</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Habit Tracker Section -->
+                        <div class="features-section">
+                            <div class="features-section-header">
+                                <div class="features-icon"><i class="fas fa-chart-line"></i></div>
+                                <h5 class="mb-0">Habit Tracker</h5>
+                            </div>
+                            <div class="features-section-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-card-icon"><i class="fas fa-tint"></i></div>
+                                            <div class="feature-card-content">
+                                                <h6>Water Tracker</h6>
+                                                <p class="mb-2 small">Track your daily water intake and stay hydrated.</p>
+                                                <span class="coming-soon-badge">Coming Soon</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-card-icon"><i class="fas fa-book-reader"></i></div>
+                                            <div class="feature-card-content">
+                                                <h6>Study Tracker</h6>
+                                                <p class="mb-2 small">Monitor your study hours and boost productivity.</p>
+                                                <span class="coming-soon-badge">Coming Soon</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-card-icon"><i class="fas fa-tasks"></i></div>
+                                            <div class="feature-card-content">
+                                                <h6>Productivity Board</h6>
+                                                <p class="mb-2 small">Visualize your productivity with our interactive board.</p>
+                                                <span class="coming-soon-badge">Coming Soon</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer features-modal-footer">
+                    <p class="text-center w-100 mb-0"><i class="fas fa-rocket me-2"></i>More features coming soon! Stay tuned for updates.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
