@@ -1,0 +1,245 @@
+/* Enhanced animations for Wordle Clone */
+
+/* Tile animations */
+@keyframes tileReveal {
+    0% {
+        transform: rotateX(0);
+        background-color: transparent;
+    }
+    50% {
+        transform: rotateX(90deg);
+        background-color: transparent;
+    }
+    50.1% {
+        background-color: var(--reveal-bg);
+    }
+    100% {
+        transform: rotateX(0);
+        background-color: var(--reveal-bg);
+    }
+}
+
+@keyframes tilePopIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    40% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes tileBounce {
+    0% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-20px);
+    }
+    60% {
+        transform: translateY(5px);
+    }
+    80% {
+        transform: translateY(-3px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes tileShake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-4px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(4px);
+    }
+}
+
+@keyframes keyPress {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.92);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(var(--pulse-color-rgb), 0.7);
+    }
+    70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(var(--pulse-color-rgb), 0);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(var(--pulse-color-rgb), 0);
+    }
+}
+
+/* Animation classes */
+.tile.filled {
+    animation: tilePopIn 0.15s;
+}
+
+.tile.reveal {
+    animation: tileReveal 0.6s;
+}
+
+.tile.bounce {
+    animation: tileBounce 0.8s;
+}
+
+.tile.shake, .row.shake {
+    animation: tileShake 0.5s;
+}
+
+.key.pressed {
+    animation: keyPress 0.15s;
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.5s;
+}
+
+.fade-in-down {
+    animation: fadeInDown 0.5s;
+}
+
+.pulse {
+    --pulse-color-rgb: 106, 170, 100;
+    animation: pulse 1.5s infinite;
+}
+
+/* Transition effects */
+.tile, .key, button {
+    transition: transform 0.1s, background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+body, .container, #game-board, #keyboard {
+    transition: background-color 0.5s, color 0.5s;
+}
+
+/* Hover effects */
+.key:hover:not(.correct):not(.present):not(.absent) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+button:hover:not(.key) {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Focus effects for accessibility */
+button:focus, .key:focus {
+    outline: 2px solid var(--correct-color);
+    outline-offset: 2px;
+}
+
+/* Loading animation */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: var(--correct-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Confetti animation for win */
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background-color: #f00;
+    opacity: 0;
+    z-index: 1000;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Toast notification */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    padding: 12px 24px;
+    border-radius: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-10px);
+}
+
+/* Theme transition */
+.theme-transition {
+    animation: theme-fade 0.5s;
+}
+
+@keyframes theme-fade {
+    0% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 1;
+    }
+}
