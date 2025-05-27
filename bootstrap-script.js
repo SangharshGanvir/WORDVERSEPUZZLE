@@ -5,16 +5,39 @@ let gameState = {
     currentTile: 0,
     gameOver: false,
     guesses: [],
-    darkMode: localStorage.getItem('darkMode') === 'true'
+    darkMode: localStorage.getItem('darkMode') === 'true',
+    wordLength: parseInt(localStorage.getItem('wordLength')) || 5,
+    difficulty: localStorage.getItem('difficulty') || 'medium'
 };
 
-// Statistics state
+// Statistics state - now organized by word length
 let statistics = {
-    gamesPlayed: 0,
-    gamesWon: 0,
+    // Global stats
     currentStreak: 0,
     maxStreak: 0,
-    guessDistribution: [0, 0, 0, 0, 0, 0]
+    // Stats per word length
+    byLength: {
+        3: {
+            gamesPlayed: 0,
+            gamesWon: 0,
+            guessDistribution: [0, 0, 0, 0, 0, 0]
+        },
+        4: {
+            gamesPlayed: 0,
+            gamesWon: 0,
+            guessDistribution: [0, 0, 0, 0, 0, 0]
+        },
+        5: {
+            gamesPlayed: 0,
+            gamesWon: 0,
+            guessDistribution: [0, 0, 0, 0, 0, 0]
+        },
+        6: {
+            gamesPlayed: 0,
+            gamesWon: 0,
+            guessDistribution: [0, 0, 0, 0, 0, 0]
+        }
+    }
 };
 
 // Sound mute state
@@ -43,7 +66,6 @@ const shareText = document.getElementById('share-text');
 const toastContainer = document.getElementById('toast-container');
 
 // Constants
-const WORD_LENGTH = 5;
 const MAX_ATTEMPTS = 6;
 
 // Sound effects system - using reliable CDN sources
@@ -141,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     statsModalInstance = new bootstrap.Modal(document.getElementById('stats-modal'));
     shareModalInstance = new bootstrap.Modal(document.getElementById('share-modal'));
     shareGameModalInstance = new bootstrap.Modal(document.getElementById('share-game-modal'));
+    settingsModalInstance = new bootstrap.Modal(document.getElementById('settings-modal'));
     
     // Preload sounds before initializing the game
     preloadSounds();
@@ -152,6 +175,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (soundToggleButton) {
         soundToggleButton.innerHTML = soundMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
     }
+    
+    // Update active word length button
+    updateActiveWordLengthButton();
 });
 
 // Initialize the game
@@ -185,6 +211,38 @@ function initializeGame() {
     }, 1000);
 }
 
+// Update settings UI based on game state
+function updateSettingsUI() {
+    // Update word length buttons
+    const wordLength = gameState.wordLength;
+    document.querySelectorAll('.word-length-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (parseInt(btn.dataset.length) === wordLength) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Update difficulty radio buttons
+    const difficulty = gameState.difficulty;
+    const difficultyRadio = document.getElementById(`difficulty-${difficulty}`);
+    if (difficultyRadio) {
+        difficultyRadio.checked = true;
+    }
+}
+
+// Apply sound mute state if set
+function applyMuteState() {
+    if (soundMuted) {
+        sounds.type.volume = 0;
+        sounds.delete.volume = 0;
+        sounds.error.volume = 0;
+        sounds.flip.volume = 0;
+        sounds.win.volume = 0;
+        sounds.theme.volume = 0;
+        sounds.copy.volume = 0;
+    }
+}
+
 // Create the game board
 function createGameBoard() {
     gameBoard.innerHTML = '';
@@ -193,7 +251,7 @@ function createGameBoard() {
         row.classList.add('row');
         row.dataset.row = i; // Add data-row attribute to the row element
         
-        for (let j = 0; j < WORD_LENGTH; j++) {
+        for (let j = 0; j < gameState.wordLength; j++) {
             const tile = document.createElement('div');
             tile.classList.add('tile');
             tile.dataset.row = i;
@@ -252,7 +310,60 @@ function setupEventListeners() {
     
     // Share game button
     shareGameButton.addEventListener('click', () => {
+        // Set the current URL in the game link input
+        document.getElementById('game-link').value = window.location.href;
         shareGameModalInstance.show();
+    });
+    
+    // Settings button
+    document.getElementById('settings-button').addEventListener('click', () => {
+        settingsModalInstance.show();
+    });
+    
+    // Word length buttons
+    document.querySelectorAll('.word-length-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const length = parseInt(button.dataset.length);
+            // Update active button
+            document.querySelectorAll('.word-length-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            button.classList.add('active');
+        });
+    });
+    
+    // Initialize settings based on game state
+    updateSettingsUI();
+    
+    // Save settings button
+    document.getElementById('save-settings').addEventListener('click', () => {
+        const activeButton = document.querySelector('.word-length-btn.active');
+        const newWordLength = parseInt(activeButton.dataset.length);
+        const newDifficulty = document.querySelector('input[name="difficulty"]:checked').value;
+        
+        // Only restart if word length changed
+        const wordLengthChanged = newWordLength !== gameState.wordLength;
+        
+        // Save settings
+        gameState.wordLength = newWordLength;
+        gameState.difficulty = newDifficulty;
+        
+        // Save to localStorage
+        localStorage.setItem('wordLength', newWordLength);
+        localStorage.setItem('difficulty', newDifficulty);
+        
+        // Close modal
+        settingsModalInstance.hide();
+        
+        // Restart game if word length changed
+        if (wordLengthChanged) {
+            showToast(`Word length changed to ${newWordLength}. Starting new game...`, 'info');
+            setTimeout(() => {
+                resetGame();
+            }, 1000);
+        } else {
+            showToast('Settings saved!', 'success');
+        }
     });
     
     // Toggle theme button
@@ -285,9 +396,27 @@ function setupEventListeners() {
     // Copy results button
     document.getElementById('copy-results').addEventListener('click', () => {
         const shareTextContent = createShareText();
-        copyToClipboard(shareTextContent);
-        showToast('Results copied to clipboard!', 'success');
-        playSound('copy');
+        const copyBtn = document.getElementById('copy-results');
+        const originalHTML = copyBtn.innerHTML;
+        
+        // Copy the text using our improved function
+        copyToClipboard(shareTextContent)
+            .then(() => {
+                // Change button text temporarily
+                copyBtn.innerHTML = '<i class="fas fa-check me-2"></i><span>Copied!</span>';
+                
+                // Play sound effect
+                playSound('copy');
+                
+                // Reset button after delay
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                }, 2000);
+            })
+            .catch(() => {
+                // Show error toast if copy failed
+                showToast('Failed to copy results. Please try again.', 'danger');
+            });
     });
     
     // Social share buttons
@@ -328,234 +457,217 @@ function setupEventListeners() {
     
     // Copy game link button
     document.getElementById('copy-game-link').addEventListener('click', () => {
-        copyToClipboard(document.getElementById('game-link').value);
-        showToast('Game link copied to clipboard!', 'success');
-        playSound('copy');
+        const gameLinkInput = document.getElementById('game-link');
+        const copySuccessMessage = document.getElementById('copy-success-message');
+        
+        // Copy the text using our improved function
+        copyToClipboard(gameLinkInput.value)
+            .then(() => {
+                // Show success message in the modal
+                copySuccessMessage.classList.remove('d-none');
+                
+                // Change button text temporarily
+                const copyBtn = document.getElementById('copy-game-link');
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> <span class="copy-text">Copied!</span>';
+                
+                // Play sound effect
+                playSound('copy');
+                
+                // Reset button after delay
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    // Hide success message after a delay
+                    setTimeout(() => {
+                        copySuccessMessage.classList.add('d-none');
+                    }, 1000);
+                }, 2000);
+            })
+            .catch(() => {
+                // Show error toast if copy failed
+                showToast('Failed to copy link. Please try again.', 'danger');
+            });
     });
 }
 
 // Select a random target word
 function selectRandomWord() {
-    // List of 5-letter words
-    const words = [
-        'APPLE', 'BRAVE', 'CHILL', 'DANCE', 'EAGER', 'FOCUS', 'GLORY', 'HAPPY',
-        'IDEAL', 'JOLLY', 'KNACK', 'LEMON', 'MAGIC', 'NOBLE', 'OCEAN', 'PIANO',
-        'QUICK', 'ROYAL', 'SMILE', 'TRUST', 'UNITY', 'VIVID', 'WORLD', 'YOUTH',
-        'ZESTY', 'ABOUT', 'BLEND', 'CRAFT', 'DREAM', 'EARTH', 'FRESH', 'GRACE',
-        'HEART', 'IMAGE', 'JUDGE', 'KNOWN', 'LIGHT', 'MUSIC', 'NIGHT', 'POWER',
-        'QUEST', 'RIVER', 'SPACE', 'TRAIN', 'URBAN', 'VALUE', 'WATER', 'XEROX'
-    ];
+    // Get the word list for the current word length
+    const words = VALID_WORDS[gameState.wordLength];
+    
+    if (!words || words.length === 0) {
+        console.error(`No words available for length ${gameState.wordLength}`);
+        return;
+    }
     
     // Select a random word
-    gameState.targetWord = words[Math.floor(Math.random() * words.length)];
+    gameState.targetWord = words[Math.floor(Math.random() * words.length)].toUpperCase();
     console.log('Target word:', gameState.targetWord); // For debugging
 }
 
-// Handle key press
 function handleKeyPress(key) {
     if (gameState.gameOver) return;
     
     if (key === 'enter') {
-        submitGuess();
+        if (gameState.currentTile === gameState.wordLength) {
+            submitGuess();
+        } else {
+            showMessage('Not enough letters!', 'warning');
+            playSound('error');
+            
+            // Shake the current row
+            const currentRow = document.querySelector(`.row[data-row='${gameState.currentRow}']`);
+            currentRow.classList.add('shake');
+            setTimeout(() => {
+                currentRow.classList.remove('shake');
+            }, 500);
+        }
     } else if (key === 'backspace') {
-        deleteLetter();
-    } else if (/^[a-z]$/.test(key) && gameState.currentTile < WORD_LENGTH) {
-        addLetter(key.toUpperCase());
+        if (gameState.currentTile > 0) {
+            gameState.currentTile--;
+            const tile = document.querySelector(`.tile[data-row='${gameState.currentRow}'][data-col='${gameState.currentTile}']`);
+            tile.textContent = '';
+            tile.classList.remove('filled');
+            playSound('delete');
+        }
+    } else if (/^[a-z]$/.test(key)) {
+        if (gameState.currentTile < gameState.wordLength) {
+            const tile = document.querySelector(`.tile[data-row='${gameState.currentRow}'][data-col='${gameState.currentTile}']`);
+            tile.textContent = key.toUpperCase();
+            tile.classList.add('filled');
+            gameState.currentTile++;
+            playSound('type');
+        }
     }
 }
 
-// Add letter to the current tile
-function addLetter(letter) {
-    if (gameState.currentTile < WORD_LENGTH) {
-        const tile = document.querySelector(`.tile[data-row='${gameState.currentRow}'][data-col='${gameState.currentTile}']`);
-        tile.textContent = letter;
-        tile.classList.add('filled');
-        gameState.currentTile++;
-        playSound('type');
-    }
-}
-
-// Delete letter from the current tile
-function deleteLetter() {
-    if (gameState.currentTile > 0) {
-        gameState.currentTile--;
-        const tile = document.querySelector(`.tile[data-row='${gameState.currentRow}'][data-col='${gameState.currentTile}']`);
-        tile.textContent = '';
-        tile.classList.remove('filled');
-        playSound('delete');
-    }
+// Check if a guess is valid (in the word list for current word length)
+function isValidGuess(guess) {
+    // Convert to lowercase for comparison with word lists
+    const lowerGuess = guess.toLowerCase();
+    
+    // Check if the guess is in the valid words or valid guesses list for the current word length
+    return VALID_WORDS[gameState.wordLength].includes(lowerGuess) || 
+           VALID_GUESSES[gameState.wordLength].includes(lowerGuess);
 }
 
 // Submit the current guess
 function submitGuess() {
-    if (gameState.currentTile < WORD_LENGTH) {
+    if (gameState.currentTile < gameState.wordLength) {
         showMessage('Not enough letters!', 'warning');
         playSound('error');
         return;
     }
-    
-    // Get the current guess
     let guess = '';
-    for (let i = 0; i < WORD_LENGTH; i++) {
+    for (let i = 0; i < gameState.wordLength; i++) {
         const tile = document.querySelector(`.tile[data-row='${gameState.currentRow}'][data-col='${i}']`);
         guess += tile.textContent;
     }
-    
-    // Check if this word has already been guessed
     if (gameState.guesses.includes(guess)) {
-        // Shake the current row to indicate duplicate word
         const currentRow = document.querySelector(`.row[data-row='${gameState.currentRow}']`);
         currentRow.classList.add('shake');
-        
-        // Remove the shake class after animation completes
         setTimeout(() => {
             currentRow.classList.remove('shake');
         }, 500);
-        
         showMessage('You already tried this word!', 'warning');
         playSound('error');
         return;
     }
     
-    // Check if the guess is a valid word in our dictionary
-    if (!VALID_GUESSES.includes(guess.toLowerCase()) && !VALID_WORDS.includes(guess.toLowerCase())) {
-        // Shake the current row to indicate invalid word
+    // Check if the guess is a valid word
+    if (!isValidGuess(guess)) {
         const currentRow = document.querySelector(`.row[data-row='${gameState.currentRow}']`);
         currentRow.classList.add('shake');
-        
-        // Remove the shake class after animation completes
         setTimeout(() => {
             currentRow.classList.remove('shake');
         }, 500);
-        
         showMessage('Not in word list!', 'warning');
         playSound('error');
         return;
     }
     
-    // Store the guess
     gameState.guesses.push(guess);
-    
-    // Evaluate the guess
     evaluateGuess(guess);
 }
 
 // Evaluate the current guess
 function evaluateGuess(guess) {
     const targetWord = gameState.targetWord;
-    const result = [];
+    const evaluation = Array(gameState.wordLength).fill('absent');
     const letterCounts = {};
     
-    // Count the occurrences of each letter in the target word
-    for (let i = 0; i < targetWord.length; i++) {
+    // Count letters in target word
+    for (let i = 0; i < gameState.wordLength; i++) {
         const letter = targetWord[i];
         letterCounts[letter] = (letterCounts[letter] || 0) + 1;
     }
     
     // First pass: mark correct letters
-    for (let i = 0; i < WORD_LENGTH; i++) {
+    for (let i = 0; i < gameState.wordLength; i++) {
         const guessLetter = guess[i];
         const targetLetter = targetWord[i];
         
         if (guessLetter === targetLetter) {
-            result[i] = 'correct';
+            evaluation[i] = 'correct';
             letterCounts[guessLetter]--;
-        } else {
-            result[i] = null;
         }
     }
     
-    // Second pass: mark present and absent letters
-    for (let i = 0; i < WORD_LENGTH; i++) {
-        if (result[i] === null) {
-            const guessLetter = guess[i];
-            
-            if (letterCounts[guessLetter] && letterCounts[guessLetter] > 0) {
-                result[i] = 'present';
-                letterCounts[guessLetter]--;
-            } else {
-                result[i] = 'absent';
-            }
+    // Second pass: mark present letters
+    for (let i = 0; i < gameState.wordLength; i++) {
+        const guessLetter = guess[i];
+        
+        if (evaluation[i] !== 'correct' && letterCounts[guessLetter] > 0) {
+            evaluation[i] = 'present';
+            letterCounts[guessLetter]--;
         }
     }
     
-    // Animate the evaluation
-    animateEvaluation(result, guess);
-    
-    return result;
+    // Animate tiles
+    animateTiles(evaluation);
 }
 
-// Animate the evaluation of the guess
-function animateEvaluation(result, guess) {
+// Animate tiles
+function animateTiles(evaluation) {
+    // Play evaluation sound
     playSound('evaluate');
     
-    for (let i = 0; i < WORD_LENGTH; i++) {
+    for (let i = 0; i < gameState.wordLength; i++) {
         const tile = document.querySelector(`.tile[data-row='${gameState.currentRow}'][data-col='${i}']`);
+        const delay = i * 300; // Stagger animation
         
-        // Add a delay to create a sequential animation
         setTimeout(() => {
             // Add flip animation
             tile.classList.add('flip');
             
-            // Add the evaluation class after half the flip animation
+            // After half of the flip animation, apply the evaluation class
             setTimeout(() => {
-                // Add the evaluation class
-                tile.classList.add(result[i]);
+                tile.classList.add(evaluation[i]);
                 
-                // Play the appropriate sound
-                playSound(result[i]);
-                
-                // If this is the last tile, update keyboard and check game state
-                if (i === WORD_LENGTH - 1) {
-                    setTimeout(() => {
-                        // Update keyboard with staggered animation
-                        updateKeyboard(guess, result);
-                        
-                        // Check game state after all animations
-                        setTimeout(() => {
-                            checkGameState();
-                        }, 500);
-                    }, 300);
+                // Play sound based on evaluation
+                if (evaluation[i] === 'correct') {
+                    playSound('correct');
+                } else if (evaluation[i] === 'present') {
+                    playSound('present');
+                } else {
+                    playSound('absent');
                 }
-            }, 150); // Half of the flip animation duration
-        }, i * 300); // 300ms delay between each tile
-    }
-}
-
-// Update keyboard with staggered animation
-function updateKeyboard(guess, result) {
-    // Store keys to update for staggered animation
-    const keysToUpdate = [];
-    
-    // Collect keyboard keys to update
-    for (let i = 0; i < WORD_LENGTH; i++) {
-        const letter = guess[i].toLowerCase();
-        const key = document.querySelector(`.key[data-key="${letter}"]`);
-        
-        if (key) {
-            keysToUpdate.push({
-                key: key,
-                result: result[i],
-                letter: letter
-            });
-        }
+                
+                // Update keyboard
+                updateKeyboard(tile.textContent, evaluation[i]);
+            }, 150);
+            
+            // Remove flip animation after it completes
+            setTimeout(() => {
+                tile.classList.remove('flip');
+            }, 300);
+        }, delay);
     }
     
-    // Update keyboard keys with staggered animation
-    keysToUpdate.forEach((item, index) => {
-        setTimeout(() => {
-            // Only update if the current state is better than the previous state
-            if (item.result === 'correct') {
-                item.key.classList.remove('present', 'absent');
-                item.key.classList.add('correct');
-            } else if (item.result === 'present' && !item.key.classList.contains('correct')) {
-                item.key.classList.remove('absent');
-                item.key.classList.add('present');
-            } else if (item.result === 'absent' && !item.key.classList.contains('correct') && !item.key.classList.contains('present')) {
-                item.key.classList.add('absent');
-            }
-        }, index * 100); // Staggered delay for keyboard animation
-    });
+    // After all tiles are animated, check if game is won or lost
+    setTimeout(() => {
+        checkGameState();
+    }, gameState.wordLength * 300 + 300);
 }
 
 // Check the game state after a guess
@@ -563,26 +675,21 @@ function checkGameState() {
     const currentGuess = gameState.guesses[gameState.currentRow];
     
     if (currentGuess === gameState.targetWord) {
-        // Win condition
+        // Game won
         gameState.gameOver = true;
-        showMessage('Congratulations!', 'success');
+        showMessage(`Congratulations! You guessed the word in ${gameState.currentRow + 1} ${gameState.currentRow === 0 ? 'try' : 'tries'}!`, 'success');
         playSound('win');
         updateStatistics(true);
-        setTimeout(() => {
-            updateStatsDisplay();
-            statsModalInstance.show();
-        }, 1500);
+        showShareButton();
+        createConfetti();
     } else if (gameState.currentRow === MAX_ATTEMPTS - 1) {
-        // Lose condition
+        // Game lost (all attempts used)
         gameState.gameOver = true;
-        showMessage(`Game over! The word was ${gameState.targetWord}`, 'danger');
+        showMessage(`Game over! The word was ${gameState.targetWord}.`, 'danger');
         updateStatistics(false);
-        setTimeout(() => {
-            updateStatsDisplay();
-            statsModalInstance.show();
-        }, 1500);
+        showShareButton();
     } else {
-        // Move to the next row
+        // Game continues
         gameState.currentRow++;
         gameState.currentTile = 0;
     }
@@ -593,38 +700,78 @@ function showMessage(text, type = 'info') {
     showToast(text, type);
 }
 
-// Show a toast notification
+// Show a toast notification with modern design
 function showToast(message, type = 'info', duration = 2000) {
+    // Get appropriate icon based on toast type
+    let icon = '';
+    switch(type) {
+        case 'success':
+            icon = '<i class="fas fa-check-circle"></i>';
+            break;
+        case 'warning':
+            icon = '<i class="fas fa-exclamation-triangle"></i>';
+            break;
+        case 'danger':
+            icon = '<i class="fas fa-times-circle"></i>';
+            break;
+        case 'info':
+        default:
+            icon = '<i class="fas fa-info-circle"></i>';
+            break;
+    }
+    
     const toast = document.createElement('div');
-    toast.classList.add('toast', 'show', `bg-${type}`, 'text-white');
+    toast.classList.add('modern-toast', 'show', `toast-${type}`);
     toast.setAttribute('role', 'alert');
     toast.setAttribute('aria-live', 'assertive');
     toast.setAttribute('aria-atomic', 'true');
     
     toast.innerHTML = `
-        <div class="toast-header bg-${type} text-white">
-            <strong class="me-auto">WORDVERSE Puzzle</strong>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        <div class="modern-toast-content">
+            <div class="toast-icon">${icon}</div>
+            <div class="toast-message">${message}</div>
+            <button type="button" class="toast-close" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-        <div class="toast-body">
-            ${message}
+        <div class="toast-progress">
+            <div class="toast-progress-bar toast-progress-${type}"></div>
         </div>
     `;
     
     toastContainer.appendChild(toast);
     
-    // Initialize Bootstrap toast
-    const bsToast = new bootstrap.Toast(toast, {
-        autohide: true,
-        delay: duration
+    // Set up progress bar animation
+    const progressBar = toast.querySelector('.toast-progress-bar');
+    progressBar.style.animationDuration = `${duration}ms`;
+    
+    // Add click event to close button
+    const closeButton = toast.querySelector('.toast-close');
+    closeButton.addEventListener('click', () => {
+        toast.classList.remove('show');
+        toast.classList.add('hiding');
+        setTimeout(() => {
+            toast.remove();
+        }, 300); // Match the CSS transition time
     });
     
-    bsToast.show();
+    // Auto-remove toast after duration
+    setTimeout(() => {
+        if (toast.parentNode) { // Check if toast is still in the DOM
+            toast.classList.remove('show');
+            toast.classList.add('hiding');
+            setTimeout(() => {
+                if (toast.parentNode) { // Double-check before removing
+                    toast.remove();
+                }
+            }, 300); // Match the CSS transition time
+        }
+    }, duration);
     
-    // Remove toast after it's hidden
-    toast.addEventListener('hidden.bs.toast', () => {
-        toast.remove();
-    });
+    // Add entrance animation class
+    setTimeout(() => {
+        toast.classList.add('animate-in');
+    }, 10);
 }
 
 // Toggle dark/light theme
@@ -659,15 +806,11 @@ function resetGame() {
     gameState.gameOver = false;
     gameState.guesses = [];
     
+    // Recreate the game board for the current word length
+    createGameBoard();
+    
     // Select a new random word
     selectRandomWord();
-    
-    // Clear the game board
-    const tiles = document.querySelectorAll('.tile');
-    tiles.forEach(tile => {
-        tile.textContent = '';
-        tile.className = 'tile';
-    });
     
     // Reset the keyboard
     const keys = document.querySelectorAll('.key');
@@ -675,16 +818,68 @@ function resetGame() {
         key.className = 'key';
     });
     
+    // Hide share container
+    shareContainer.classList.add('d-none');
+    
     // Show a message
-    showMessage('New game started!', 'success');
+    showMessage(`New ${gameState.wordLength}-letter word game started!`, 'success');
     playSound('type');
 }
 
-// Load statistics from local storage
+// Load statistics from local storage with migration support
 function loadStatistics() {
     const savedStats = localStorage.getItem('wordleStats');
     if (savedStats) {
-        statistics = JSON.parse(savedStats);
+        const parsedStats = JSON.parse(savedStats);
+        
+        // Check if we need to migrate from old format to new format
+        if (parsedStats.hasOwnProperty('gamesPlayed') && !parsedStats.hasOwnProperty('byLength')) {
+            // This is the old format, migrate to new format
+            const oldStats = parsedStats;
+            
+            // Create new statistics structure
+            const newStats = {
+                currentStreak: oldStats.currentStreak || 0,
+                maxStreak: oldStats.maxStreak || 0,
+                byLength: {
+                    3: {
+                        gamesPlayed: 0,
+                        gamesWon: 0,
+                        guessDistribution: [0, 0, 0, 0, 0, 0]
+                    },
+                    4: {
+                        gamesPlayed: 0,
+                        gamesWon: 0,
+                        guessDistribution: [0, 0, 0, 0, 0, 0]
+                    },
+                    5: {
+                        gamesPlayed: 0,
+                        gamesWon: 0,
+                        guessDistribution: [0, 0, 0, 0, 0, 0]
+                    },
+                    6: {
+                        gamesPlayed: 0,
+                        gamesWon: 0,
+                        guessDistribution: [0, 0, 0, 0, 0, 0]
+                    }
+                }
+            };
+            
+            // Move old stats to the default word length (5)
+            newStats.byLength[5].gamesPlayed = oldStats.gamesPlayed || 0;
+            newStats.byLength[5].gamesWon = oldStats.gamesWon || 0;
+            newStats.byLength[5].guessDistribution = oldStats.guessDistribution || [0, 0, 0, 0, 0, 0];
+            
+            // Update statistics with migrated data
+            statistics = newStats;
+            
+            // Save the new format
+            saveStatistics();
+            console.log('Statistics migrated to new format');
+        } else {
+            // Already in new format
+            statistics = parsedStats;
+        }
     }
 }
 
@@ -695,12 +890,16 @@ function saveStatistics() {
 
 // Update statistics after a game
 function updateStatistics(won) {
-    statistics.gamesPlayed++;
+    // Get the current word length
+    const wordLength = gameState.wordLength;
+    
+    // Update word-length specific stats
+    statistics.byLength[wordLength].gamesPlayed++;
     
     if (won) {
-        statistics.gamesWon++;
+        statistics.byLength[wordLength].gamesWon++;
         statistics.currentStreak++;
-        statistics.guessDistribution[gameState.currentRow]++;
+        statistics.byLength[wordLength].guessDistribution[gameState.currentRow]++;
         
         if (statistics.currentStreak > statistics.maxStreak) {
             statistics.maxStreak = statistics.currentStreak;
@@ -714,10 +913,29 @@ function updateStatistics(won) {
 
 // Update the statistics display
 function updateStatsDisplay() {
+    // Get the current word length
+    const wordLength = gameState.wordLength;
+    const lengthStats = statistics.byLength[wordLength];
+    
+    // Add word length to the stats title
+    const statsTitle = document.querySelector('#stats-modal .modal-title');
+    if (statsTitle) {
+        statsTitle.textContent = `Statistics (${wordLength}-letter mode)`;
+    }
+    
+    // Calculate total games played and won across all word lengths
+    let totalGamesPlayed = 0;
+    let totalGamesWon = 0;
+    
+    Object.values(statistics.byLength).forEach(lengthStat => {
+        totalGamesPlayed += lengthStat.gamesPlayed;
+        totalGamesWon += lengthStat.gamesWon;
+    });
+    
     // Update statistics numbers
-    document.getElementById('games-played').textContent = statistics.gamesPlayed;
-    document.getElementById('win-percentage').textContent = statistics.gamesPlayed > 0 
-        ? Math.round((statistics.gamesWon / statistics.gamesPlayed) * 100) + '%' 
+    document.getElementById('games-played').textContent = lengthStats.gamesPlayed;
+    document.getElementById('win-percentage').textContent = lengthStats.gamesPlayed > 0 
+        ? Math.round((lengthStats.gamesWon / lengthStats.gamesPlayed) * 100) + '%' 
         : '0%';
     document.getElementById('current-streak').textContent = statistics.currentStreak;
     document.getElementById('max-streak').textContent = statistics.maxStreak;
@@ -726,10 +944,10 @@ function updateStatsDisplay() {
     const distributionContainer = document.getElementById('guess-distribution');
     distributionContainer.innerHTML = '';
     
-    const maxGuesses = Math.max(...statistics.guessDistribution);
+    const maxGuesses = Math.max(...lengthStats.guessDistribution);
     
-    for (let i = 0; i < statistics.guessDistribution.length; i++) {
-        const count = statistics.guessDistribution[i];
+    for (let i = 0; i < lengthStats.guessDistribution.length; i++) {
+        const count = lengthStats.guessDistribution[i];
         const percentage = maxGuesses > 0 ? (count / maxGuesses) * 100 : 0;
         
         const row = document.createElement('div');
@@ -744,11 +962,43 @@ function updateStatsDisplay() {
         
         distributionContainer.appendChild(row);
     }
+    
+    // Add a section showing overall stats across all word lengths
+    const overallStatsContainer = document.getElementById('overall-stats');
+    if (!overallStatsContainer) {
+        const statsContainer = document.querySelector('.stats-container');
+        if (statsContainer) {
+            const overallSection = document.createElement('div');
+            overallSection.id = 'overall-stats';
+            overallSection.classList.add('mt-4');
+            overallSection.innerHTML = `
+                <h5>Overall Statistics</h5>
+                <div class="d-flex justify-content-between mb-3">
+                    <div class="text-center">
+                        <div class="stat-number">${totalGamesPlayed}</div>
+                        <div class="stat-label">Total Games</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="stat-number">${totalGamesPlayed > 0 ? Math.round((totalGamesWon / totalGamesPlayed) * 100) + '%' : '0%'}</div>
+                        <div class="stat-label">Overall Win %</div>
+                    </div>
+                </div>
+            `;
+            statsContainer.appendChild(overallSection);
+        }
+    } else {
+        // Update existing overall stats
+        const totalGamesEl = overallStatsContainer.querySelector('.stat-number:first-child');
+        const winPercentEl = overallStatsContainer.querySelector('.stat-number:last-child');
+        if (totalGamesEl) totalGamesEl.textContent = totalGamesPlayed;
+        if (winPercentEl) winPercentEl.textContent = totalGamesPlayed > 0 ? Math.round((totalGamesWon / totalGamesPlayed) * 100) + '%' : '0%';
+    }
 }
 
 // Create share text
 function createShareText() {
     let shareText = `WORDVERSE Puzzle ${new Date().toLocaleDateString()}\n`;
+    shareText += `${gameState.wordLength}-letter mode\n`;
     shareText += `${gameState.currentRow + 1}/${MAX_ATTEMPTS}\n\n`;
     
     for (let i = 0; i < gameState.guesses.length; i++) {
@@ -788,18 +1038,44 @@ function prepareShareModal(shareText) {
 
 // Copy text to clipboard
 function copyToClipboard(text) {
-    // Create a temporary textarea element
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.setAttribute('readonly', '');
-    textarea.style.position = 'absolute';
-    textarea.style.left = '-9999px';
-    document.body.appendChild(textarea);
-    
-    // Select and copy the text
-    textarea.select();
-    document.execCommand('copy');
-    
-    // Remove the temporary textarea
-    document.body.removeChild(textarea);
+    return new Promise((resolve, reject) => {
+        // Use modern clipboard API if available
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    resolve(true);
+                })
+                .catch(err => {
+                    console.warn('Clipboard API failed:', err);
+                    fallbackCopyToClipboard(text) ? resolve(true) : reject(false);
+                });
+        } else {
+            // Fallback for older browsers
+            fallbackCopyToClipboard(text) ? resolve(true) : reject(false);
+        }
+    });
+}
+
+// Fallback copy method for older browsers
+function fallbackCopyToClipboard(text) {
+    try {
+        // Create a temporary textarea element
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'absolute';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        
+        // Select and copy the text
+        textarea.select();
+        const success = document.execCommand('copy');
+        
+        // Remove the temporary textarea
+        document.body.removeChild(textarea);
+        return success;
+    } catch (err) {
+        console.error('Fallback clipboard copy failed:', err);
+        return false;
+    }
 }

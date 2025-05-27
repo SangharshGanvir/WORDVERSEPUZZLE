@@ -63,11 +63,14 @@
                         <button id="share-game" class="btn btn-outline-light rounded-circle" aria-label="Share this game">
                             <i class="fas fa-share-alt"></i>
                         </button>
-                        <button id="toggle-theme" class="btn btn-outline-light rounded-circle" aria-label="Toggle dark mode">
+                        <button id="toggle-theme" class="btn btn-outline-light rounded-circle" aria-label="Toggle theme">
                             <i class="fas fa-moon"></i>
                         </button>
                         <button id="sound-toggle" class="btn btn-outline-light rounded-circle" aria-label="Toggle sound">
                             <i class="fas fa-volume-up"></i>
+                        </button>
+                        <button id="settings-button" class="btn btn-outline-light rounded-circle" aria-label="Game settings">
+                            <i class="fas fa-cog"></i>
                         </button>
                         <button id="reset-game" class="btn btn-outline-light rounded-circle" aria-label="New game">
                             <i class="fas fa-sync-alt"></i>
@@ -136,14 +139,18 @@
         <!-- Share Results Modal -->
         <div id="share-modal" class="modal fade" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
+                <div class="modal-content share-modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Share Your Results</h5>
                         <button type="button" class="btn-close share-modal-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="share-stats mb-3">
-                            <div class="row text-center">
+                        <!-- Animated confetti background -->
+                        <div class="share-confetti-bg"></div>
+                        
+                        <!-- Stats cards with modern design -->
+                        <div class="share-stats mb-4">
+                            <div class="row text-center g-2">
                                 <div class="col-4">
                                     <div class="share-stat">
                                         <div class="share-stat-value" id="share-guesses">0/6</div>
@@ -164,31 +171,37 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="share-grid mb-3" id="share-grid"></div>
                         
-                        <div class="share-options">
+                        <!-- Result grid with animation -->
+                        <div class="share-grid-container mb-4">
+                            <div class="share-grid-title">Your Results</div>
+                            <div class="share-grid" id="share-grid"></div>
+                        </div>
+                        
+                        <!-- Modern share options with hover effects -->
+                        <div class="share-options mb-3">
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <button id="copy-results" class="btn btn-outline-primary w-100">
-                                        <i class="fas fa-copy"></i>
+                                    <button id="copy-results" class="btn btn-modern w-100 copy-btn">
+                                        <i class="fas fa-copy me-2"></i>
                                         <span>Copy Results</span>
                                     </button>
                                 </div>
                                 <div class="col-6">
-                                    <button id="share-twitter" class="btn btn-outline-info w-100">
-                                        <i class="fab fa-twitter"></i>
+                                    <button id="share-twitter" class="btn btn-modern twitter-btn w-100">
+                                        <i class="fab fa-twitter me-2"></i>
                                         <span>Twitter</span>
                                     </button>
                                 </div>
                                 <div class="col-6">
-                                    <button id="share-facebook" class="btn btn-outline-primary w-100">
-                                        <i class="fab fa-facebook-f"></i>
+                                    <button id="share-facebook" class="btn btn-modern facebook-btn w-100">
+                                        <i class="fab fa-facebook-f me-2"></i>
                                         <span>Facebook</span>
                                     </button>
                                 </div>
                                 <div class="col-6">
-                                    <button id="share-whatsapp" class="btn btn-outline-success w-100">
-                                        <i class="fab fa-whatsapp"></i>
+                                    <button id="share-whatsapp" class="btn btn-modern whatsapp-btn w-100">
+                                        <i class="fab fa-whatsapp me-2"></i>
                                         <span>WhatsApp</span>
                                     </button>
                                 </div>
@@ -205,50 +218,69 @@
         <!-- Share Game Modal -->
         <div id="share-game-modal" class="modal fade" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
+                <div class="modal-content share-modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Share WORDVERSE Puzzle</h5>
                         <button type="button" class="btn-close share-game-modal-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p>Share this game with your friends and challenge them to solve the daily word puzzle!</p>
+                        <!-- Decorative elements -->
+                        <div class="share-game-decoration"></div>
                         
+                        <!-- Game preview card -->
+                        <div class="game-preview-card mb-4">
+                            <div class="game-preview-icon">
+                                <i class="fas fa-puzzle-piece"></i>
+                            </div>
+                            <div class="game-preview-content">
+                                <h6 class="mb-1">WORDVERSE Puzzle</h6>
+                                <p class="mb-0">Challenge your friends to solve today's word puzzle!</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Modern URL copy section -->
+                        <div class="url-copy-section mb-4">
+                            <label for="game-link" class="form-label fw-bold">Game Link:</label>
+                            <div class="input-group url-copy-group">
+                                <input type="text" class="form-control" id="game-link" readonly>
+                                <button id="copy-game-link" class="btn btn-modern copy-btn">
+                                    <i class="fas fa-copy"></i>
+                                    <span class="copy-text">Copy</span>
+                                </button>
+                            </div>
+                            <div id="copy-success-message" class="copy-success-message mt-1 d-none">
+                                <i class="fas fa-check-circle"></i> Link copied to clipboard!
+                            </div>
+                        </div>
+                        
+                        <!-- Modern share options with hover effects -->
                         <div class="share-options">
+                            <h6 class="mb-3 fw-bold">Share via:</h6>
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <button id="share-game-twitter" class="btn btn-outline-info w-100">
-                                        <i class="fab fa-twitter"></i>
+                                    <button id="share-game-twitter" class="btn btn-modern twitter-btn w-100">
+                                        <i class="fab fa-twitter me-2"></i>
                                         <span>Twitter</span>
                                     </button>
                                 </div>
                                 <div class="col-6">
-                                    <button id="share-game-facebook" class="btn btn-outline-primary w-100">
-                                        <i class="fab fa-facebook-f"></i>
+                                    <button id="share-game-facebook" class="btn btn-modern facebook-btn w-100">
+                                        <i class="fab fa-facebook-f me-2"></i>
                                         <span>Facebook</span>
                                     </button>
                                 </div>
                                 <div class="col-6">
-                                    <button id="share-game-whatsapp" class="btn btn-outline-success w-100">
-                                        <i class="fab fa-whatsapp"></i>
+                                    <button id="share-game-whatsapp" class="btn btn-modern whatsapp-btn w-100">
+                                        <i class="fab fa-whatsapp me-2"></i>
                                         <span>WhatsApp</span>
                                     </button>
                                 </div>
                                 <div class="col-6">
-                                    <button id="share-game-email" class="btn btn-outline-secondary w-100">
-                                        <i class="fas fa-envelope"></i>
+                                    <button id="share-game-email" class="btn btn-modern email-btn w-100">
+                                        <i class="fas fa-envelope me-2"></i>
                                         <span>Email</span>
                                     </button>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-4">
-                            <label for="game-link" class="form-label">Game Link:</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="game-link" value="https://wordverse-puzzle.com" readonly>
-                                <button id="copy-game-link" class="btn btn-outline-secondary">
-                                    <i class="fas fa-copy"></i>
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -367,6 +399,102 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal fade" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content settings-modal-content">
+                    <div class="modal-header settings-modal-header">
+                        <h5 class="modal-title"><i class="fas fa-cog me-2"></i>Game Settings</h5>
+                        <button type="button" class="btn-close settings-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body settings-modal-body">
+                        <!-- Decorative elements -->
+                        <div class="settings-decoration"></div>
+                        
+                        <div class="settings-container">
+                            <div class="settings-card mb-4">
+                                <div class="settings-card-header">
+                                    <div class="settings-icon"><i class="fas fa-text-height"></i></div>
+                                    <h6 class="fw-bold mb-0">Word Length</h6>
+                                </div>
+                                <div class="settings-card-body">
+                                    <p class="text-muted small mb-3">Choose how many letters you want to play with. Changing this will start a new game.</p>
+                                    <div class="word-length-selector">
+                                        <button class="word-length-btn" data-length="3">
+                                            <span class="length-value">3</span>
+                                            <span class="length-label">Easy</span>
+                                        </button>
+                                        <button class="word-length-btn" data-length="4">
+                                            <span class="length-value">4</span>
+                                            <span class="length-label">Casual</span>
+                                        </button>
+                                        <button class="word-length-btn active" data-length="5">
+                                            <span class="length-value">5</span>
+                                            <span class="length-label">Classic</span>
+                                        </button>
+                                        <button class="word-length-btn" data-length="6">
+                                            <span class="length-value">6</span>
+                                            <span class="length-label">Expert</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-card mb-4">
+                                <div class="settings-card-header">
+                                    <div class="settings-icon"><i class="fas fa-chart-line"></i></div>
+                                    <h6 class="fw-bold mb-0">Difficulty</h6>
+                                </div>
+                                <div class="settings-card-body">
+                                    <p class="text-muted small mb-3">Select the difficulty level for word selection.</p>
+                                    <div class="difficulty-selector">
+                                        <div class="difficulty-option">
+                                            <input type="radio" class="btn-check" name="difficulty" id="difficulty-easy" value="easy" autocomplete="off">
+                                            <label class="difficulty-btn difficulty-easy" for="difficulty-easy">
+                                                <span class="difficulty-icon"><i class="fas fa-smile"></i></span>
+                                                <span class="difficulty-info">
+                                                    <span class="difficulty-name">Easy</span>
+                                                    <span class="difficulty-desc">Common words</span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="difficulty-option">
+                                            <input type="radio" class="btn-check" name="difficulty" id="difficulty-medium" value="medium" autocomplete="off" checked>
+                                            <label class="difficulty-btn difficulty-medium" for="difficulty-medium">
+                                                <span class="difficulty-icon"><i class="fas fa-meh"></i></span>
+                                                <span class="difficulty-info">
+                                                    <span class="difficulty-name">Medium</span>
+                                                    <span class="difficulty-desc">Mixed difficulty</span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="difficulty-option">
+                                            <input type="radio" class="btn-check" name="difficulty" id="difficulty-hard" value="hard" autocomplete="off">
+                                            <label class="difficulty-btn difficulty-hard" for="difficulty-hard">
+                                                <span class="difficulty-icon"><i class="fas fa-dizzy"></i></span>
+                                                <span class="difficulty-info">
+                                                    <span class="difficulty-name">Hard</span>
+                                                    <span class="difficulty-desc">Challenging words</span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer settings-modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary save-settings-btn" id="save-settings">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
                     </div>
                 </div>
             </div>
