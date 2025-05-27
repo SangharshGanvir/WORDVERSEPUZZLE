@@ -79,7 +79,8 @@ const sounds = {
     absent: new Audio('https://cdn.freesound.org/previews/362/362204_6629938-lq.mp3'),
     win: new Audio('https://cdn.freesound.org/previews/456/456966_5121236-lq.mp3'),
     theme: new Audio('https://cdn.freesound.org/previews/320/320181_5260872-lq.mp3'),
-    copy: new Audio('https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3')
+    copy: new Audio('https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3'),
+    confetti: new Audio('https://cdn.freesound.org/previews/411/411089_5121236-lq.mp3')
 };
 
 // Preload sounds with error handling
@@ -242,6 +243,25 @@ function updateSettingsUI() {
     }
 }
 
+// Update active word length button
+function updateActiveWordLengthButton() {
+    const wordLength = gameState.wordLength;
+    document.querySelectorAll('.word-length-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (parseInt(btn.dataset.length) === wordLength) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+// Show share button when game is over
+function showShareButton() {
+    const shareButton = document.getElementById('shareButton');
+    if (shareButton) {
+        shareButton.style.display = 'block';
+    }
+}
+
 // Apply sound mute state if set
 function applyMuteState() {
     if (soundMuted) {
@@ -277,6 +297,12 @@ function createGameBoard() {
 
 // Set up event listeners
 function setupEventListeners() {
+    // Add a special console command to reveal the answer
+    window.showMeAnswer = function() {
+        console.log('The answer is:', gameState.targetWord);
+        return 'Answer revealed in console!';
+    };
+    
     // Keyboard clicks
     keyboard.addEventListener('click', (e) => {
         if (e.target.classList.contains('key')) {
@@ -518,7 +544,6 @@ function selectRandomWord() {
     
     // Select a random word
     gameState.targetWord = words[Math.floor(Math.random() * words.length)].toUpperCase();
-    console.log('Target word:', gameState.targetWord); // For debugging
 }
 
 function handleKeyPress(key) {
@@ -1011,6 +1036,30 @@ function updateStatsDisplay() {
     }
 }
 
+// Update keyboard based on letter evaluation
+function updateKeyboard(letter, status) {
+    const key = document.querySelector(`.key[data-key='${letter.toLowerCase()}']`);
+    if (!key) return;
+    
+    // Only update if the new status is more important than the current one
+    // Priority: correct > present > absent
+    if (key.classList.contains('correct')) {
+        // Already marked as correct, don't downgrade
+        return;
+    }
+    
+    if (key.classList.contains('present') && status !== 'correct') {
+        // Already marked as present, only upgrade to correct
+        return;
+    }
+    
+    // Remove existing status classes
+    key.classList.remove('correct', 'present', 'absent');
+    
+    // Add the new status class
+    key.classList.add(status);
+}
+
 // Create share text
 function createShareText() {
     let shareText = `WORDVERSE Puzzle ${new Date().toLocaleDateString()}\n`;
@@ -1050,6 +1099,37 @@ function prepareShareModal(shareText) {
     
     // Set the text for copying
     shareText.value = shareText;
+}
+
+// Create confetti animation for winning the game
+function createConfetti() {
+    // Play the confetti sound effect
+    playSound('confetti');
+    
+    const confettiContainer = document.createElement('div');
+    confettiContainer.className = 'confetti-container';
+    document.body.appendChild(confettiContainer);
+    
+    // Create multiple confetti pieces
+    const colors = ['#f94144', '#f3722c', '#f8961e', '#f9c74f', '#90be6d', '#43aa8b', '#577590'];
+    const totalConfetti = 150;
+    
+    for (let i = 0; i < totalConfetti; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        confetti.style.animationDelay = Math.random() * 2 + 's';
+        confettiContainer.appendChild(confetti);
+    }
+    
+    // Remove confetti after animation completes
+    setTimeout(() => {
+        if (confettiContainer && confettiContainer.parentNode) {
+            confettiContainer.parentNode.removeChild(confettiContainer);
+        }
+    }, 6000);
 }
 
 // Copy text to clipboard
