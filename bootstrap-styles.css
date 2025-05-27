@@ -908,6 +908,15 @@ html[data-theme='dark'] .form-control {
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     overflow: hidden;
+    background-color: #ffffff;
+    color: var(--text-color);
+}
+
+/* Dark mode support for modal content */
+html[data-theme='dark'] .modal-content {
+    background-color: var(--modal-bg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    color: var(--text-color);
 }
 
 .modal-header {
@@ -958,6 +967,32 @@ html[data-theme='dark'] .form-control {
 /* Dark mode support for modal body */
 html[data-theme='dark'] .modal-body {
     background-color: #1e1e1e;
+    color: var(--text-color);
+}
+
+html[data-theme='dark'] .features-modal-body {
+    background-color: #1e1e1e;
+    color: var(--text-color);
+}
+
+html[data-theme='dark'] .modal-body p,
+html[data-theme='dark'] .modal-body h6,
+html[data-theme='dark'] .modal-body .text-muted {
+    color: var(--text-color) !important;
+}
+
+html[data-theme='dark'] .modal-body .card,
+html[data-theme='dark'] .modal-body .feature-card {
+    background-color: #2a2a2c;
+    border-color: #3a3a3c;
+}
+
+html[data-theme='dark'] .feature-card-content p {
+    color: #aaaaaa !important;
+}
+
+html[data-theme='dark'] .feature-card-content h6 {
+    color: #ffffff !important;
 }
 
 /* Specific override for features modal body */
@@ -991,6 +1026,11 @@ html[data-theme='dark'] .modal-body {
     margin-bottom: 25px;
 }
 
+html[data-theme='dark'] .features-section {
+    background-color: #1e1e1e;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
 .features-section-header {
     display: flex;
     align-items: center;
@@ -998,6 +1038,11 @@ html[data-theme='dark'] .modal-body {
     background-color: #f8f9fa;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     background: linear-gradient(to right, #f8f9fa, #ffffff);
+}
+
+html[data-theme='dark'] .features-section-header {
+    background: linear-gradient(to right, #2a2a2c, #1e1e1e);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .features-icon {
@@ -1027,6 +1072,12 @@ html[data-theme='dark'] .modal-body {
     border: 1px solid rgba(0, 0, 0, 0.05);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
     margin-bottom: 5px;
+}
+
+html[data-theme='dark'] .feature-card {
+    background-color: #2a2a2c;
+    border-color: #3a3a3c;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .feature-card:hover {
@@ -1080,6 +1131,12 @@ html[data-theme='dark'] .modal-body {
     align-self: flex-start;
 }
 
+html[data-theme='dark'] .coming-soon-badge {
+    background-color: #b38600;
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 /* Uniform Modal Footer Styles */
 .modal-footer {
     background-color: #f8f9fa;
@@ -1091,6 +1148,23 @@ html[data-theme='dark'] .modal-body {
 html[data-theme='dark'] .modal-footer {
     background-color: #2a2a2c;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+}
+
+html[data-theme='dark'] .features-modal-footer {
+    background-color: #2a2a2c;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+}
+
+html[data-theme='dark'] .btn-outline-secondary {
+    color: #aaaaaa;
+    border-color: #3a3a3c;
+}
+
+html[data-theme='dark'] .btn-outline-secondary:hover {
+    background-color: #3a3a3c;
+    color: #ffffff;
 }
 
 /* Specific override for features modal footer */
